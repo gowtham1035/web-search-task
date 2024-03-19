@@ -1,3 +1,11 @@
+from collections import defaultdict
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from urllib.request import urlopen
+from urllib.parse import urlparse, urljoin
+from bs4 import BeautifulSoup
+import re
+import csv
 
 class WebCrawler:
     def __init__(self):
@@ -26,14 +34,6 @@ class WebCrawler:
         return links
 
 
-# from collections import defaultdict
-# from nltk.corpus import stopwords
-# from nltk.tokenize import word_tokenize
-# from urllib.request import urlopen
-# from urllib.parse import urlparse, urljoin
-# from bs4 import BeautifulSoup
-# import re
-# import csv
 
 class RankingAlgorithm:
     def __init__(self, indexer):
