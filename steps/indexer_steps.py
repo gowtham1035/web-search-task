@@ -27,4 +27,6 @@ class IndexerTests:
 
     @then('the inverted index should contain "{word}" with URL "{url}"')
     def check_index_with_url(self, word, url):
+        print("Index content:", self.indexer.get_index())
+        assert word in self.indexer.get_index(), f"Word '{word}' not found in the index."
         assert url in self.indexer.get_index()[word], f"Word '{word}' not found in index with URL '{url}'"
