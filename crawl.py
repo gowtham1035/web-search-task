@@ -1,11 +1,15 @@
 from collections import defaultdict
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from urllib.request import urlopen
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import re
 import csv
+
+
 
 class WebCrawler:
     def __init__(self):
@@ -59,8 +63,8 @@ class Indexer:
         self.stop_words = set(stopwords.words('english'))
 
     # Clean and normalize text (lowercase, alnum, remove stop words)
-    def process_text(self, text):
-        words = word_tokenize(text)
+    def process_text(self, word):
+        words = word.split(" ")
         words = [word.lower() for word in words if word.isalnum() and word.lower() not in self.stop_words]
         return words
 

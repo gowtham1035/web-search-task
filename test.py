@@ -49,7 +49,7 @@ def main(input_type, input_data, query):
         print(f"{url} - Score: {score}")
 
 if __name__ == "__main__":
-    input_type = input("Enter input type (url or file): ")
-    input_data = input("Enter URL or file path: ")
-    query = input("Enter query: ")
+    input_type = "url"
+    input_data = "https://example.com"
+    query = "domain"
     main(input_type, input_data, query)
