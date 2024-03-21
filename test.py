@@ -20,27 +20,27 @@ def process_url(url):
         print("Error:", e)
         return ""
 
-def process_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            return file.read()
-    except Exception as e:
-        print("Error:", e)
-        return ""
+# def process_file(file_path):
+#     try:
+#         with open(file_path, 'r') as file:
+#             return file.read()
+#     except Exception as e:
+#         print("Error:", e)
+#         return ""
 
-def main(input_type, input_data, query):
+def main(input_data, query):
     crawler = WebCrawler()
     indexer = Indexer()
     ranking_algorithm = RankingAlgorithm(indexer)
 
-    if input_type == 'url':
-        links = crawler.crawl(input_data)
-        for link in links:
-            text = process_url(link)
-            indexer.build_index_from_text(text, url=link)
-    elif input_type == 'file':
-        text = process_file(input_data)
-        indexer.build_index_from_text(text)
+    # if input_type == 'url':
+    links = crawler.crawl(input_data)
+    for link in links:
+        text = process_url(link)
+        indexer.build_index_from_text(text, url=link)
+    # elif input_type == 'file':
+    #     text = process_file(input_data)
+    #     indexer.build_index_from_text(text)
 
     results = ranking_algorithm.score_pages(query)
 
@@ -49,7 +49,7 @@ def main(input_type, input_data, query):
         print(f"{url} - Score: {score}")
 
 if __name__ == "__main__":
-    input_type = input("Enter input type (url or file): ")
-    input_data = input("Enter URL or file path: ")
+    # input_type = input("Enter input type (url or file): ")
+    input_data = input("Enter URL: ")
     query = input("Enter query: ")
-    main(input_type, input_data, query)
+    main(input_data, query)
