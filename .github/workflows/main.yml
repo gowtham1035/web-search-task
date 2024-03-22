@@ -33,9 +33,13 @@ jobs:
           pip install --upgrade pip
           pip install requests beautifulsoup4 behave
 
-      - name: TestCrawler
+      - name: Run Unit Tests for test.py
         run: |
           python -m unittest test.py
+
+      - name: Run Unit Tests for test_web_crawler.py
+        run: |
+          python -m unittest test_web_crawler.py
 
       - name: TestCrawlerAfterSetup
         run: |
