@@ -33,11 +33,14 @@ jobs:
           pip install --upgrade pip
           pip install requests beautifulsoup4 behave
 
-      - name: Build Docker Image
-        run: |
-          docker build -t my_web_crawler_image .
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag gowtham1035/web-search-task:latest
 
       - name: Push Docker Image
-        run: |
-          docker tag my_web_crawler_image gowtham1035/web-search-task:latest
-          docker push gowtham1035/web-search-task:latest
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: gowtham1035/web-search-task:latest
