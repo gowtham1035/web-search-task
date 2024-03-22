@@ -39,4 +39,5 @@ jobs:
 
       - name: Push Docker Image
         run: |
+          docker tag my_web_crawler_image gowtham1035/web-search-task:latest
           docker push gowtham1035/web-search-task:latest
