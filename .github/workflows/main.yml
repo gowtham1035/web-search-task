@@ -22,17 +22,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Clear cache
+      - name: Clear cache and update
         run: |
           sudo apt-get clean
-          sudo rm -rf /var/cache/apt/*
           sudo apt-get update
 
       - name: Install Python and dependencies
         run: |
-          apt-get update && \
-          apt-get install -y python3-pip gcc && \
-          pip install --upgrade pip && \
+          sudo apt-get install -y python3-pip gcc
+          pip install --upgrade pip
           pip install requests beautifulsoup4 behave
 
       - name: TestCrawler
