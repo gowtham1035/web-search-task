@@ -35,9 +35,7 @@ jobs:
 
       - name: Run Behave Tests
         run: |
-            behave --steps=C:\Users\gowth\OneDrive\Desktop\PSC\18.3.24\web-search-task\features\steps
-
-
+           behave features --steps=C:\Users\gowth\OneDrive\Desktop\PSC\18.3.24\web-search-task\features\steps
       - name: Build Docker Image
         run: |
           docker build -t my_web_crawler_image .
