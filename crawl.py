@@ -1,100 +1,44 @@
-from collections import defaultdict
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from urllib.request import urlopen
-from urllib.parse import urlparse, urljoin
+import requests
 from bs4 import BeautifulSoup
-import re
-import csv
+from collections import defaultdict
+from urllib.parse import urljoin, urlparse
 
 class WebCrawler:
     def __init__(self):
-        self.visited_urls = set()
-    
-    def crawl(self, url):
-        if url in self.visited_urls:
-            return []
-        
-        self.visited_urls.add(url)
-        links = []
-        
+        self.index = defaultdict(list)
+        self.visited = set()
+
+    def crawl(self, url, base_url=None, depth=0, max_depth=4):
+        if url in self.visited or depth > max_depth:
+            return
+        self.visited.add(url)
+
         try:
-            html_page = urlopen(url)
-            soup = BeautifulSoup(html_page, "html.parser")
-            
-            for link in soup.findAll('a', href=True):
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            self.index[url] = soup.get_text()
+
+            for link in soup.find_all('a'):
                 href = link.get('href')
-                if href and not href.startswith('javascript:') and not href.startswith('tel:'):
-                    full_url = urljoin(url, href)
-                    links.append(full_url)
-                
+                if href:
+                    if urlparse(href).netloc:
+                        href = urljoin(base_url or url, href)
+                    if href.startswith(base_url or url):
+                        self.crawl(href, base_url=base_url or url, depth=depth+1, max_depth=max_depth)
         except Exception as e:
-            print("Error:", e)
-        
-        return links
+            print(f"Error crawling {url}: {e}")
 
+    def search(self, url, keyword):
+        results = []
+        for link, text in self.index.items():
+            if url and url in link and keyword.lower() in text.lower():
+                results.append(link)
+        return results
 
-class WebCrawler:
-    def __init__(self):
-        self.visited_urls = set()
-    
-    def crawl(self, url):
-        if url in self.visited_urls:
-            return []
-        
-        self.visited_urls.add(url)
-        links = []
-        
-        try:
-            html_page = urlopen(url)
-            soup = BeautifulSoup(html_page, "html.parser")
-            
-            for link in soup.findAll('a', href=True):
-                href = link.get('href')
-                if href and not href.startswith('javascript:') and not href.startswith('tel:'):
-                    full_url = urljoin(url, href)
-                    links.append(full_url)
-                
-        except Exception as e:
-            print("Error:", e)
-        
-        return links
-
-class RankingAlgorithm:
-    def __init__(self, indexer):
-        self.indexer = indexer
-    
-    def score_pages(self, query):
-        query_words = set(self.indexer.process_text(query))
-        index = self.indexer.get_index()
-        scores = defaultdict(int)
-        
-        for word in query_words:
-            if word in index:
-                for url in index[word]:
-                    scores[url] += 1
-        
-        return sorted(scores.items(), key=lambda x: x[1], reverse=True)
-
-class Indexer:
-    # Inverted index (words -> document URLs)
-    def __init__(self):
-        self.inverted_index = defaultdict(list)
-        # Stop words from NLTK (assumed imported)
-        self.stop_words = set(stopwords.words('english'))
-
-    # Clean and normalize text (lowercase, alnum, remove stop words)
-    def process_text(self, text):
-        words = word_tokenize(text)
-        words = [word.lower() for word in words if word.isalnum() and word.lower() not in self.stop_words]
-        return words
-
-    # Build index from text, optionally associate URL
-    def build_index_from_text(self, text, url=None):
-        words = self.process_text(text)
-        for word in words:
-            self.inverted_index[word].append(url)
-
-    # Get the built inverted index
-    def get_index(self):
-        return self.inverted_index
+    def print_results(self, results):
+        if results:
+            print("Search results:")
+            for result in results:
+                print(f"- {result}")
+        else:
+            print("No results found.")

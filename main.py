@@ -1,56 +1,28 @@
-import requests
-from bs4 import BeautifulSoup
-from collections import defaultdict
-from urllib.parse import urljoin, urlparse
+from flask import Flask, request, jsonify
+from crawl import WebCrawler
 
-class WebCrawler:
-    def __init__(self):
-        self.index = defaultdict(list)
-        self.visited = set()
+app = Flask(__name__)
+crawler = WebCrawler()
 
-    def crawl(self, url, base_url=None, depth = 0, max_depth = 4):
-        if url in self.visited or depth > max_depth:
-            return
-        self.visited.add(url)
+@app.route('/')
+def index():
+    return 'Welcome to the Web Search API!'
 
-        try:
-            response = requests.get(url)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            self.index[url] = soup.get_text()
+@app.route('/crawl', methods=['POST'])
+def crawl():
+    data = request.json
+    start_url = data.get('start_url')
+    if not start_url:
+        return jsonify({"error": "Start URL is required"}), 400
+    crawler.crawl(start_url)
+    return jsonify({"message": "Crawling completed successfully!"})
 
-            for link in soup.find_all('a'):
-                href = link.get('href')
-                if href:
-                    if urlparse(href).netloc:
-                        href = urljoin(base_url or url, href)
-                    if href.startswith(base_url or url):
-                        self.crawl(href, base_url=base_url or url,depth=depth+1, max_depth=max_depth)
-        except Exception as e:
-            print(f"Error crawling {url}: {e}")
+@app.route('/search', methods=['GET'])
+def search():
+    url = request.args.get('url')
+    keyword = request.args.get('keyword')
+    results = crawler.search(url, keyword)
+    return jsonify({"results": results})
 
-    def search(self, keyword):
-        results = []
-        for url, text in self.index.items():
-            if keyword.lower() in text.lower():
-                results.append(url)
-        return results
-
-    def print_results(self, results):
-        if results:
-            print("Search results:")
-            for result in results:
-                print(f"- {result}") # modified the code by changing the variable name which was causing the error.
-        else:
-            print("No results found.")
-
-def main():
-    crawler = WebCrawler()
-    start_url = "https://www.msit.ac.in"
-    crawler.crawl(start_url) # changed craw to crawl, # function calling is fixed
-
-    keyword = "murthy"
-    results = crawler.search(keyword)
-    crawler.print_results(results)
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
