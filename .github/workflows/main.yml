@@ -33,9 +33,10 @@ jobs:
           pip install --upgrade pip
           pip install requests beautifulsoup4 behave
 
-      - name: TestCrawlerAfterSetup
+      - name: Run Behave Tests
         run: |
-          behave
+            behave --steps=C:\Users\gowth\OneDrive\Desktop\PSC\18.3.24\web-search-task\features\steps
+
 
       - name: Build Docker Image
         run: |
